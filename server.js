@@ -46,7 +46,7 @@ async function apiMessageNew(req, res) {
             throw new Error('Message field is required');
         }
 
-        const responseMessage = `${API_KEY_1} Hello ${data.message}`;
+        const responseMessage = `${process.env.API_KEY_1} Hello ${data.message}`;
         
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: responseMessage }));
