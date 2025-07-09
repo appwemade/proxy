@@ -6,8 +6,8 @@ process.on('uncaughtException', (err) => {
     console.error('Uncaught Exception:', err);
 });
 
-async function apiMessageNew(req, res) {
-    if (req.url !== '/apiMessageNew') return;
+async function apiAIMessageNew(req, res) {
+    if (req.url !== '/apiAIMessageNew') return;
     if (res.finished) return;
 
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -73,7 +73,7 @@ async function api404(req, res) {
 
 http.createServer(async (req, res) => {
     try {
-        await apiMessageNew(req, res);
+        await apiAIMessageNew(req, res);
         await api404(req, res);
     } catch (err) {
         res.writeHead(500, { 'Content-Type': 'application/json' });
