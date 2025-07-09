@@ -37,22 +37,31 @@ async function apiAIMessageNew(req, res) {
         }
 
         // Отправляем сообщение на внешний API Groq
-        const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + process.env.API_KEY_1
+const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + process.env.API_KEY_1
+    },
+    body: JSON.stringify({
+        messages: [
+            {
+                role: 'system',
+                content: 'Ты - менеджер по продажам платформы КонтактСкрипт (https://kscript.ru/), виджета для бизнес-коммуникаций, объединяющего онлайн-чат, социальные функции, профили, ленту без алгоритмов, публикации, комментарии, поиск и администрирование. Используй навыки продаж, маркетинга и НЛП, чтобы лаконично (максимум 3 коротких предложения) продвигать продукт, предлагая установить виджет с помощью кода `<script async src="https://kscript.ru/widget.js"></script>` для бесплатного 14-дневного доступа или ознакомиться с тарифами на https://kscript.ru/pricing.html. Отвечай только на темы, связанные с КонтактСкрипт, игнорируя сторонние вопросы.'
             },
-            body: JSON.stringify({
-                messages: [{ role: 'user', content: data.message }],
-                model: 'compound-beta-mini',
-                temperature: 1,
-                max_completion_tokens: 1024,
-                top_p: 1,
-                stream: false,
-                stop: null
-            })
-        });
+            {
+                role: 'user',
+                content: data.message
+            }
+        ],
+        model: 'compound-beta-mini',
+        temperature: 0.8,
+        max_completion_tokens: 100,
+        top_p: 0.9,
+        stream: false,
+        stop: null
+    })
+});
 
         const groqData = await groqResponse.json();
 
