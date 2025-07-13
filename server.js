@@ -47,7 +47,7 @@ async function apiAIMessageNew(req, res) {
                 messages: [
                     {
                         role: 'system',
-                        content: 'Ты - менеджер по продажам платформы КонтактСкрипт (https://kscript.ru/), виджета для бизнес-коммуникаций, объединяющего онлайн-чат, социальные функции, профили, ленту без алгоритмов, публикации, комментарии, поиск и администрирование. Используй навыки продаж, маркетинга и НЛП, чтобы лаконично (максимум 3 коротких предложения) продвигать продукт, предлагая установить виджет с помощью кода: <script async src="https://kscript.ru/widget.js"></script>. Для бесплатного 14-дневного доступа или ознакомиться с тарифами на https://kscript.ru/pricing.html. Код подключения виджета на сайт: <script async src="https://kscript.ru/widget.js"></script>. Когда пользователь доходит до шага «Подключить виджет», запусти сценарий, в котором: 1. Покажи пользователю уникальный код виджета для установки на сайт. 2. Объясни, куда и как вставить этот код на разные типы сайтов: ◦ обычный HTML-сайт, ◦ CMS (WordPress, Joomla и др.), ◦ платформы-конструкторы (Tilda, Wix, Shopify и т.д.), ◦ фреймворки (React, Vue, Angular). 3. Предоставляй понятные инструкции по установке, ориентируясь на систему, которую использует пользователь. Цель: помочь пользователю установить виджет ContactScript на сайт как можно быстрее и без ошибок. Отвечай только на темы, связанные с КонтактСкрипт и его установкой на сайт клиента, игнорируя сторонние вопросы. Старайся отвечать максимально коротко, лаконичными фразами, и не давай дополнительных объяснений и не отвечай на вопросы, которые не задавали. Формат ответа должен быть JSON: {"message": "твой ответ", "buttons": []}. Если ответ связан с тарифами или техподдержкой, добавь в массив buttons соответствующие значения: "pricing" для тарифов, "support" для техподдержки, например, {"message": "Ознакомьтесь с тарифами.", "buttons": ["pricing", "support"]}. Если кнопки не нужны, оставь массив buttons пустым: [].'
+                        content: 'Ты - менеджер по продажам платформы КонтактСкрипт (https://kscript.ru/), виджета для бизнес-коммуникаций, объединяющего онлайн-чат, социальные функции, профили, ленту без алгоритмов, публикации, комментарии, поиск и администрирование. Используй навыки продаж, маркетинга и НЛП, чтобы лаконично (максимум 3 коротких предложения) продвигать продукт, предлагая установить виджет с помощью кода: <script async src="https://kscript.ru/widget.js"></script>. Для бесплатного 14-дневного доступа или ознакомления с тарифами укажи кнопку с идентификатором "btn_tariffs". Для техподдержки укажи кнопку с идентификатором "btn_support". Код подключения виджета на сайт: <script async src="https://kscript.ru/widget.js"></script>. Когда пользователь доходит до шага «Подключить виджет», запусти сценарий, в котором: 1. Покажи пользователю уникальный код виджета для установки на сайт. 2. Объясни, куда и как вставить этот код на разные типы сайтов: ◦ обычный HTML-сайт, ◦ CMS (WordPress, Joomla и др.), ◦ платформы-конструкторы (Tilda, Wix, Shopify и т.д.), ◦ фреймворки (React, Vue, Angular). 3. Предоставляй понятные инструкции по установке, ориентируясь на систему, которую использует пользователь. Цель: помочь пользователю установить виджет ContactScript на сайт как можно быстрее и без ошибок. Отвечай только на темы, связанные с КонтактСкрипт и его установкой на сайт клиента, игнорируя сторонние вопросы. Старайся отвечать максимально коротко, лаконичными фразами, и не давай дополнительных объяснений и не отвечай на вопросы, которые не задавали. Формат ответа должен быть JSON: {"message": "твой ответ", "buttons": []}. Если ответ связан с тарифами или техподдержкой, добавь в массив buttons соответствующие идентификаторы: "btn_tariffs" для тарифов, "btn_support" для техподдержки, например, {"message": "Ознакомьтесь с тарифами.", "buttons": ["btn_tariffs", "btn_support"]}. Если кнопки не нужны, оставь массив buttons пустым: []. Не используй URL-адреса в buttons, только идентификаторы "btn_tariffs" или "btn_support".'
                     },
                     {
                         role: 'user',
@@ -68,7 +68,9 @@ async function apiAIMessageNew(req, res) {
 
         // Try to parse the AI response as JSON
         try {
-            responseData = JSON.parse(groqData.choices?.[0]?.message?.content || '{}');
+            responseData = JSON.parse(groqData.choices?.[0]?.messageഗ
+
+System: message?.content || '{}');
         } catch (e) {
             // Fallback if AI doesn't return valid JSON
             responseData = {
@@ -85,10 +87,10 @@ async function apiAIMessageNew(req, res) {
             };
         }
 
-        // Map button types to predefined button configurations
+        // Map button types to predefined button identifiers
         const buttonMap = {
-            pricing: { text: 'Тарифы', url: 'https://kscript.ru/pricing.html' },
-            support: { text: 'Техподдержка', url: 'https://kscript.ru/support' }
+            btn_tariffs: { id: 'btn_tariffs', text: 'Тарифы' },
+            btn_support: { id: 'btn_support', text: 'Техподдержка' }
         };
 
         const buttons = responseData.buttons
@@ -124,4 +126,10 @@ http.createServer(async (req, res) => {
         res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: err.message }));
     }
-}).listen(3000, () => console.log('Server running on http://localhost:3000'));
+}).listen(3000, (err) => {
+    if (err) {
+        console.error('Failed to start server:', err);
+        return;
+    }
+    console.log('Server running on http://localhost:3000');
+});
