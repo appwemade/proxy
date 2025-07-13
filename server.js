@@ -36,7 +36,7 @@ async function apiAIMessageNew(req, res) {
             throw new Error('Message field is required');
         }
 
-        // Отправляем сообщение на внешний API Groq
+        // Send message to external Groq API
         const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -64,9 +64,45 @@ async function apiAIMessageNew(req, res) {
         });
 
         const groqData = await groqResponse.json();
+        let responseData;
+
+        // Try to parse the AI response as JSON
+        try {
+            responseData = JSON.parse(groqData.choices?.[0]?.message?.content || '{}');
+        } catch (e) {
+            // Fallback if AI doesn't return valid JSON
+            responseData = {
+                message: groqData.choices?.[0]?.message?.content || 'No response from API',
+                buttons: []
+            };
+        }
+
+        // Ensure responseData has the expected structure
+        if (!responseData.message || !Array.isArray(responseData.buttons)) {
+            responseData = {
+                message: responseData.message || 'No response from API',
+                buttons: []
+            };
+        }
+
+        // Map button types to predefined button configurations
+        const buttonMap = {
+            pricing: { text: 'Тарифы', url: 'https://kscript.ru/pricing.html' },
+            support: { text: 'Техподдержка', url: 'https://kscript.ru/support' }
+        };
+
+        const buttons = responseData.buttons
+            .filter(type => buttonMap[type]) // Only include valid button types
+            .map(type => buttonMap[type]);
+
+        // Prepare response payload
+        const responsePayload = {
+            message: responseData.message,
+            buttons: buttons
+        };
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(groqData));
+        res.end(JSON.stringify(responsePayload));
     } catch (err) {
         console.error('Error processing request:', err);
         res.writeHead(400, { 'Content-Type': 'application/json' });
